@@ -209,6 +209,39 @@ void moverCocheRojo(int& x, int& y, int velocidad)
     dibujarCoche(x, y, COLOR_COCHE_ROJO);
 }
 
+bool detectarColision(int x1, int y1, int x2, int y2)
+{
+    // Asumiendo que los coches tienen un tamaño de 6x4
+    return (x1 < x2 + 6 && x1 + 6 > x2 && y1 < y2 + 4 && y1 + 4 > y2);
+}
+
+void dibujarX(int x, int y)
+{
+    color(15); // Color blanco
+
+    gotoxy(x, y);
+    cout << CUBO;
+    gotoxy(x + 1, y + 1);
+    cout << CUBO;
+    gotoxy(x + 2, y + 2);
+    cout << CUBO;
+    gotoxy(x + 3, y + 3);
+    cout << CUBO;
+    gotoxy(x + 4, y + 4);
+    cout << CUBO;
+
+    gotoxy(x + 4, y);
+    cout << CUBO;
+    gotoxy(x + 3, y + 1);
+    cout << CUBO;
+    gotoxy(x + 2, y + 2);
+    cout << CUBO;
+    gotoxy(x + 1, y + 3);
+    cout << CUBO;
+    gotoxy(x, y + 4);
+    cout << CUBO;
+}
+
 void instrucciones() // Funcion para mostrar las instrucciones
 {
     system("cls");
@@ -251,7 +284,7 @@ void juego()
     int velocidadVerde = 1; // Velocidad del coche verde
 
     // Coordenadas iniciales para el coche rojo
-    int xRojo = 50; // Posición horizontal del coche rojo
+    int xRojo = 25 + (75 - 25) / 2 - 3; // Posición horizontal del coche rojo
     int yRojo = 0; // Posición vertical inicial del coche rojo
     int velocidadRojo = 1; // Velocidad del coche rojo
 
@@ -266,10 +299,26 @@ void juego()
         {
             char tecla = _getch();
             if (tecla == 27) exit(0); // Salir si se presiona ESC
-            else if (tecla == 72) { dxVerde = 0; dyVerde = -1; } // Arriba
-            else if (tecla == 80) { dxVerde = 0; dyVerde = 1; } // Abajo
-            else if (tecla == 77) { dxVerde = 1; dyVerde = 0; } // Derecha
-            else if (tecla == 75) { dxVerde = -1; dyVerde = 0; } // Izquierda
+            else if (tecla == 72)
+            {
+                dxVerde = 0;
+                dyVerde = -1;
+            } // Arriba
+            else if (tecla == 80)
+            {
+                dxVerde = 0;
+                dyVerde = 1;
+            } // Abajo
+            else if (tecla == 77)
+            {
+                dxVerde = 1;
+                dyVerde = 0;
+            } // Derecha
+            else if (tecla == 75)
+            {
+                dxVerde = -1;
+                dyVerde = 0;
+            } // Izquierda
         }
 
         borrarCoche(xVerde, yVerde);
@@ -283,6 +332,12 @@ void juego()
         borrarCoche(xRojo, yRojo);
         yRojo += velocidadRojo;
         if (yRojo >= ALTO - 4) yRojo = 0; // Reiniciar la posición vertical cuando llegue al final
+
+        if (detectarColision(xVerde, yVerde, xRojo, yRojo))
+        {
+            dibujarX((xVerde + xRojo) / 2, (yVerde + yRojo) / 2); // Dibujar "X" en la posición de la colisión
+            exit(0); // Terminar el juego en caso de colisión
+        }
 
         redibujarLineas(); // Redibujar las líneas blancas
         dibujarCoche(xVerde, yVerde, COLOR_COCHE);
